@@ -343,6 +343,8 @@
     private int _currentMemberPage = 1;
     private const int MembersPerPage = 8;
     private Member? _selectedMemberDetails;
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? MemberSearch { get; set; }
     private bool _showCheckIn;
     private string _selectedMember = "";
     private string _checkInStatus = "Present";
@@ -422,6 +424,14 @@
             _currentTime = GetLagosTime();
             _ = InvokeAsync(StateHasChanged);
         }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(MemberSearch))
+        {
+            _query = MemberSearch.Trim();
+            _currentMemberPage = 1;
+        }
     }
     private static DateTime GetLagosTime()
     {

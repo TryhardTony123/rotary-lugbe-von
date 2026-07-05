@@ -37,7 +37,11 @@
     <main class="main-area">
         <header class="topbar">
             <button class="mobile-menu" @onclick="ToggleMenu" aria-label="Open navigation">☰</button>
-            <a class="top-search" href="#members"><span>⌕</span><span>Search members...</span></a>
+            <form class="top-search" method="get" action="/#members">
+                <span>⌕</span>
+                <input name="q" aria-label="Search members" placeholder="Search members..." required />
+                <button type="submit">Search</button>
+            </form>
             <div class="top-actions">
                 <span class="meeting-date">Fellowship: <b>Biweekly · 3:30 PM for 4:00 PM</b></span>
                 <a class="bell" href="#birthdays" aria-label="Birthday notifications">♢<i></i></a>
