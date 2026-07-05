@@ -53,12 +53,12 @@
     <section class="metrics">
         <article>
             <span class="metric-icon blue">♙</span>
-            <div><small>Total members</small><strong>84</strong><p><b>+3</b> this Rotary year</p></div>
+            <div><small>Total members</small><strong>@Members.Count</strong><p>Registered Rotarians</p></div>
             <i>↗</i>
         </article>
         <article>
             <span class="metric-icon gold">✓</span>
-            <div><small>Last meeting</small><strong>@PresentCount</strong><p>of 84 members present</p></div>
+            <div><small>Last meeting</small><strong>@PresentCount</strong><p>of @Members.Count members present</p></div>
             <i>↗</i>
         </article>
         <article>
@@ -260,11 +260,31 @@
 
     private readonly List<Member> Members =
     [
-        new("Amina Yusuf", "RY-1048", "Public Health", "AY", "#D9E7FB", "6:03 PM", true),
-        new("Tunde Adebayo", "RY-1022", "Civil Engineering", "TA", "#FBE2D5", "6:11 PM", true),
-        new("Ngozi Eze", "RY-1071", "Legal Practice", "NE", "#E2ECD7", "6:18 PM", true),
-        new("David Okafor", "RY-1055", "Financial Services", "DO", "#EEE2FA", "—", false),
-        new("Fatima Bello", "RY-1090", "Education", "FB", "#F7E9C9", "6:27 PM", true)
+        new("Akinkuehinmi Segun", "RY-1001", "Rotarian", "AS", "#D9E7FB", "—", false),
+        new("Hafsah Balogun Omotoso", "RY-1002", "Rotarian", "HBO", "#FBE2D5", "—", false),
+        new("Agbogunleye Femi", "RY-1003", "Rotarian", "AF", "#E2ECD7", "—", false),
+        new("Adesanya Sunkanmi", "RY-1004", "Rotarian", "AS", "#EEE2FA", "—", false),
+        new("Ibiso Ohiagba", "RY-1005", "Rotarian", "IO", "#F7E9C9", "—", false),
+        new("Adekunle Sonukan", "RY-1006", "Rotarian", "AS", "#D9E7FB", "—", false),
+        new("Festus Etaze", "RY-1007", "Rotarian", "FE", "#FBE2D5", "—", false),
+        new("Pankshak Haggai", "RY-1008", "Rotarian", "PH", "#E2ECD7", "—", false),
+        new("Amadi Okechukwu", "RY-1009", "Rotarian", "AO", "#EEE2FA", "—", false),
+        new("Prince Chukwuma Onyenankeya", "RY-1010", "Rotarian", "PCO", "#F7E9C9", "—", false),
+        new("Akinola Macarthy", "RY-1011", "Rotarian", "AM", "#D9E7FB", "—", false),
+        new("Alphonsus Ajugwe", "RY-1012", "Rotarian", "AA", "#FBE2D5", "—", false),
+        new("Isah Emmanuel Idris", "RY-1013", "Rotarian", "IEI", "#E2ECD7", "—", false),
+        new("Olatunji Aransiola", "RY-1014", "Rotarian", "OA", "#EEE2FA", "—", false),
+        new("Agnes Ikechi-Oleka", "RY-1015", "Rotarian", "AIO", "#F7E9C9", "—", false),
+        new("Sunday Job", "RY-1016", "Rotarian", "SJ", "#D9E7FB", "—", false),
+        new("Akinyemi Anderson", "RY-1017", "Rotarian", "AA", "#FBE2D5", "—", false),
+        new("Ahmed Badejo", "RY-1018", "Rotarian", "AB", "#E2ECD7", "—", false),
+        new("Bidemi Adeyemo", "RY-1019", "Rotarian", "BA", "#EEE2FA", "—", false),
+        new("Olusola Ogundele", "RY-1020", "Rotarian", "OO", "#F7E9C9", "—", false),
+        new("Celestine Opurum", "RY-1021", "Rotarian", "CO", "#D9E7FB", "—", false),
+        new("Udeh Chijioke", "RY-1022", "Rotarian", "UC", "#FBE2D5", "—", false),
+        new("Adegoke Bamidele", "RY-1023", "Rotarian", "AB", "#E2ECD7", "—", false),
+        new("Ndaguda Nelly", "RY-1024", "Rotarian", "NN", "#EEE2FA", "—", false),
+        new("Jane Ejikeme", "RY-1025", "Rotarian", "JE", "#F7E9C9", "—", false)
     ];
     private readonly List<Birthday> Birthdays =
     [
@@ -310,9 +330,9 @@
             return $"https://wa.me/?text={Uri.EscapeDataString(message)}";
         }
     }
-    private int PresentCount => 66 + Members.Count(m => m.Present) - 4;
-    private int AbsentCount => 84 - PresentCount;
-    private int AttendanceRate => (int)Math.Round(PresentCount / 84d * 100);
+    private int PresentCount => Members.Count(m => m.Present);
+    private int AbsentCount => Members.Count - PresentCount;
+    private int AttendanceRate => Members.Count == 0 ? 0 : (int)Math.Round(PresentCount / (double)Members.Count * 100);
     private void ToggleAttendance(Member member) => member.Present = !member.Present;
     private void OpenCheckIn() { _showCheckIn = true; _notice = ""; }
     private void CloseCheckIn() => _showCheckIn = false;
