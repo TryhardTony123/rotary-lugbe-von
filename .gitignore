@@ -1,0 +1,14 @@
+node_modules
+dist
+bin
+obj
+publish
+output
+tools
+*.zip
+.env
+.env.local
+*.log
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts

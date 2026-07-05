@@ -1,0 +1,11 @@
+bin/
+obj/
+node_modules/
+dist/
+publish/
+output/
+tools/
+.git/
+*.log
+*.zip
+src/

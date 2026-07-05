@@ -1,0 +1,264 @@
+@page "/"
+@rendermode InteractiveServer
+
+<PageTitle>Rotary Club of Lugbe VON — Attendance & Birthdays</PageTitle>
+
+<div class="dashboard" id="dashboard">
+    <section class="welcome">
+        <div>
+            <p class="overline">SATURDAY, 4 JULY 2026</p>
+            <h1>Good evening, VON Lugbe Rotarians.</h1>
+            <p>Here’s what’s happening in your club this month.</p>
+        </div>
+        <button class="primary-action" @onclick="OpenCheckIn"><span>＋</span> Mark attendance</button>
+    </section>
+
+    <section class="rotary-year-banner">
+        <img src="new-rotary-year.jpeg" alt="Happy New Rotary Year" />
+        <div>
+            <span class="overline">A NEW YEAR OF SERVICE</span>
+            <h2>Happy New Rotary Year!</h2>
+            <p>Here’s to another year of fellowship, service above self, and lasting impact with the Rotary Club of Abuja Lugbe VON.</p>
+        </div>
+        <span class="banner-year">2026<br /><small>2027</small></span>
+    </section>
+
+    <section class="metrics">
+        <article>
+            <span class="metric-icon blue">♙</span>
+            <div><small>Total members</small><strong>84</strong><p><b>+3</b> this Rotary year</p></div>
+            <i>↗</i>
+        </article>
+        <article>
+            <span class="metric-icon gold">✓</span>
+            <div><small>Last meeting</small><strong>@PresentCount</strong><p>of 84 members present</p></div>
+            <i>↗</i>
+        </article>
+        <article>
+            <span class="metric-icon green">◔</span>
+            <div><small>Attendance rate</small><strong>@AttendanceRate%</strong><p><b>+4.2%</b> from last month</p></div>
+            <i>↗</i>
+        </article>
+        <article>
+            <span class="metric-icon coral">♢</span>
+            <div><small>July birthdays</small><strong>6</strong><p><b>2</b> coming up this week</p></div>
+            <i>↗</i>
+        </article>
+    </section>
+
+    <section class="meeting-link-card">
+        <div class="meeting-date-box"><b>05</b><span>JUL</span></div>
+        <div class="meeting-link-copy">
+            <span class="overline">ROTARY CLUB OF ABUJA LUGBE VON</span>
+            <h2>Handover Ceremony &amp; Fellowship · 5 July 2026</h2>
+            <p>3:30 PM for 4:00 PM · 10PM Lounge, VON Garden City, No. 22 Sabon Lugbe, Abuja</p>
+        </div>
+        <button class="invitation-button" @onclick="OpenInvitation"><span>▧</span> View invitation</button>
+    </section>
+
+    <section class="bank-share-card">
+        <div class="bank-icon">₦</div>
+        <div class="bank-details">
+            <span class="overline">ROTARY CLUB OF LUGBE VON ACCOUNT</span>
+            <b>Account No: 1015520143</b>
+            <label>Bank
+                <input placeholder="Enter bank name" @bind="_bankName" @bind:event="oninput" />
+            </label>
+        </div>
+        @if (string.IsNullOrWhiteSpace(_bankName))
+        {
+            <button class="whatsapp-share disabled" disabled>Enter bank name first</button>
+        }
+        else
+        {
+            <a class="whatsapp-share" href="@WhatsAppShareUrl" target="_blank" rel="noopener">
+                <span>◉</span> Share to WhatsApp
+            </a>
+        }
+    </section>
+
+    <section class="dashboard-grid">
+        <div class="panel attendance-panel" id="attendance">
+            <div class="panel-heading">
+                <div><h2>Recent attendance</h2><p>Thursday fellowship · 2 July 2026</p></div>
+                <div class="panel-actions">
+                    <div class="table-search"><span>⌕</span><input placeholder="Find member" @bind="_query" @bind:event="oninput" /></div>
+                    <button class="outline-btn">Export</button>
+                </div>
+            </div>
+            <div class="attendance-summary">
+                <div class="progress-ring"><span>@AttendanceRate<small>%</small></span></div>
+                <div><b>Strong turnout</b><p>@PresentCount members checked in for the last fellowship.</p></div>
+                <div class="legend"><span><i class="present-dot"></i> Present @PresentCount</span><span><i class="absent-dot"></i> Absent @AbsentCount</span></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Member</th><th>Classification</th><th>Check-in</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        @foreach (var member in FilteredMembers)
+                        {
+                            <tr>
+                                <td><div class="member"><span style="background:@member.Color">@member.Initials</span><div><b>@member.Name</b><small>@member.Id</small></div></div></td>
+                                <td>@member.Classification</td>
+                                <td>@member.CheckIn</td>
+                                <td><button class="status @(member.Present ? "present" : "absent")" @onclick="() => ToggleAttendance(member)"><i></i>@(member.Present ? "Present" : "Absent")</button></td>
+                                <td><button class="more">•••</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <button class="view-all">View full attendance register <span>→</span></button>
+        </div>
+
+        <aside class="panel birthday-panel" id="birthdays">
+            <div class="panel-heading">
+                <div><h2>Upcoming birthdays</h2><p>Celebrate our Rotarians</p></div>
+                <button class="calendar-button">▦</button>
+            </div>
+            <div class="birthday-hero">
+                <span class="confetti one">✦</span><span class="confetti two">•</span><span class="confetti three">◆</span>
+                <div class="birthday-avatar">CN</div>
+                <small>NEXT BIRTHDAY · IN 2 DAYS</small>
+                <h3>Chidi Nwosu</h3>
+                <p>Monday, 6 July</p>
+                <button @onclick="SendChidiWish">Send birthday wish</button>
+            </div>
+            <div class="birthday-list">
+                @foreach (var birthday in Birthdays)
+                {
+                    <article>
+                        <div class="date-tile"><b>@birthday.Day</b><small>JUL</small></div>
+                        <div><b>@birthday.Name</b><small>@birthday.Role</small></div>
+                        <button @onclick="() => SendWish(birthday.Name)" title="Send birthday wish">✉</button>
+                    </article>
+                }
+            </div>
+            <button class="view-all">View all birthdays <span>→</span></button>
+        </aside>
+    </section>
+
+    <section class="monthly panel">
+        <div class="panel-heading"><div><h2>Monthly attendance trend</h2><p>Rotary year 2026/27</p></div><span class="trend-up">↗ 8.4% growth</span></div>
+        <div class="bar-chart">
+            @foreach (var point in Trend)
+            {
+                <div><span style="height:@($"{point.Value}%")"><i>@point.Value%</i></span><small>@point.Month</small></div>
+            }
+        </div>
+    </section>
+</div>
+
+@if (_showCheckIn)
+{
+    <div class="modal-backdrop">
+        <section class="checkin-modal">
+            <header><div><span>✓</span><div><h2>Mark attendance</h2><p>Thursday fellowship · 9 July 2026</p></div></div><button @onclick="CloseCheckIn">×</button></header>
+            <label>Member name
+                <select @bind="_selectedMember">
+                    <option value="">Select a member</option>
+                    @foreach (var member in Members) { <option value="@member.Name">@member.Name</option> }
+                </select>
+            </label>
+            <label>Attendance status
+                <div class="status-options">
+                    <button class="@(_checkInStatus == "Present" ? "selected" : "")" @onclick="SetPresent"><i class="present-dot"></i>Present</button>
+                    <button class="@(_checkInStatus == "Absent" ? "selected" : "")" @onclick="SetAbsent"><i class="absent-dot"></i>Absent</button>
+                </div>
+            </label>
+            @if (!string.IsNullOrEmpty(_notice)) { <p class="modal-notice">@_notice</p> }
+            <button class="save-button" @onclick="SaveCheckIn">Save attendance</button>
+        </section>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(_toast))
+{
+    <div class="toast"><span>✓</span>@_toast</div>
+}
+
+@if (_showInvitation)
+{
+    <div class="invitation-backdrop" @onclick="CloseInvitation">
+        <section class="invitation-modal" @onclick:stopPropagation>
+            <header><div><b>Handover Ceremony &amp; Fellowship</b><small>Sunday, 5 July 2026</small></div><button @onclick="CloseInvitation">×</button></header>
+            <img src="rotary-handover-july-5.jpeg" alt="Rotary Club of Abuja Lugbe VON handover ceremony invitation" />
+        </section>
+    </div>
+}
+
+@code {
+    private string _query = "";
+    private bool _showCheckIn;
+    private string _selectedMember = "";
+    private string _checkInStatus = "Present";
+    private string _notice = "";
+    private string _toast = "";
+    private bool _showInvitation;
+    private string _bankName = "";
+
+    private readonly List<Member> Members =
+    [
+        new("Amina Yusuf", "RY-1048", "Public Health", "AY", "#D9E7FB", "6:03 PM", true),
+        new("Tunde Adebayo", "RY-1022", "Civil Engineering", "TA", "#FBE2D5", "6:11 PM", true),
+        new("Ngozi Eze", "RY-1071", "Legal Practice", "NE", "#E2ECD7", "6:18 PM", true),
+        new("David Okafor", "RY-1055", "Financial Services", "DO", "#EEE2FA", "—", false),
+        new("Fatima Bello", "RY-1090", "Education", "FB", "#F7E9C9", "6:27 PM", true)
+    ];
+    private readonly List<Birthday> Birthdays =
+    [
+        new("09", "Oluchi Eke", "Club Treasurer"),
+        new("14", "Emeka Ibe", "Past President"),
+        new("21", "Aisha Lawal", "Rotarian"),
+        new("28", "Bode Martins", "Service Chair")
+    ];
+    private readonly List<TrendPoint> Trend =
+    [
+        new("Feb", 58), new("Mar", 66), new("Apr", 62), new("May", 75), new("Jun", 71), new("Jul", 79)
+    ];
+
+    private IEnumerable<Member> FilteredMembers => Members.Where(m => $"{m.Name} {m.Classification} {m.Id}".Contains(_query, StringComparison.OrdinalIgnoreCase));
+    private string WhatsAppShareUrl
+    {
+        get
+        {
+            var message = $"Rotary Club of Lugbe VON Account Details:\nAccount No: 1015520143\nBank: {_bankName.Trim()}";
+            return $"https://wa.me/?text={Uri.EscapeDataString(message)}";
+        }
+    }
+    private int PresentCount => 66 + Members.Count(m => m.Present) - 4;
+    private int AbsentCount => 84 - PresentCount;
+    private int AttendanceRate => (int)Math.Round(PresentCount / 84d * 100);
+    private void ToggleAttendance(Member member) => member.Present = !member.Present;
+    private void OpenCheckIn() { _showCheckIn = true; _notice = ""; }
+    private void CloseCheckIn() => _showCheckIn = false;
+    private void SetPresent() => _checkInStatus = "Present";
+    private void SetAbsent() => _checkInStatus = "Absent";
+    private void OpenInvitation() => _showInvitation = true;
+    private void CloseInvitation() => _showInvitation = false;
+    private Task SendChidiWish() => SendWish("Chidi Nwosu");
+    private async Task SaveCheckIn()
+    {
+        if (string.IsNullOrEmpty(_selectedMember)) { _notice = "Please select a member."; return; }
+        var member = Members.First(m => m.Name == _selectedMember);
+        member.Present = _checkInStatus == "Present";
+        member.CheckIn = member.Present ? DateTime.Now.ToString("h:mm tt") : "—";
+        _showCheckIn = false;
+        _toast = $"Attendance saved for {_selectedMember}.";
+        await Task.Delay(2800);
+        _toast = "";
+    }
+    private async Task SendWish(string name)
+    {
+        _toast = $"Birthday wish prepared for {name}.";
+        await Task.Delay(2800);
+        _toast = "";
+    }
+    private sealed class Member(string name, string id, string classification, string initials, string color, string checkIn, bool present)
+    {
+        public string Name { get; } = name; public string Id { get; } = id; public string Classification { get; } = classification;
+        public string Initials { get; } = initials; public string Color { get; } = color; public string CheckIn { get; set; } = checkIn; public bool Present { get; set; } = present;
+    }
+    private sealed record Birthday(string Day, string Name, string Role);
+    private sealed record TrendPoint(string Month, int Value);
+}

@@ -1,0 +1,49 @@
+@inherits LayoutComponentBase
+
+<div class="app-shell">
+    @if (_menuOpen)
+    {
+        <button class="nav-scrim" @onclick="ToggleMenu" aria-label="Close navigation"></button>
+    }
+    <aside class="@(_menuOpen ? "sidebar open" : "sidebar")">
+        <div class="brand">
+            <span class="rotary-wheel">✦</span>
+            <div><b>Rotary</b><small>Lugbe VON</small></div>
+        </div>
+        <div class="club-card">
+            <span>RC</span>
+            <div><b>Rotary Club of Lugbe VON</b><small>Abuja · Nigeria</small></div>
+        </div>
+        <nav>
+            <span class="nav-label">CLUB MANAGEMENT</span>
+            <a href="#dashboard" class="active"><i>⌂</i> Overview</a>
+            <a href="#attendance"><i>✓</i> Attendance</a>
+            <a href="#birthdays"><i>♢</i> Birthdays</a>
+            <span class="nav-label lower">ACCOUNT</span>
+            <a href="#members"><i>♙</i> Members</a>
+            <a href="#settings"><i>⚙</i> Settings</a>
+        </nav>
+        <div class="side-profile">
+            <span>VR</span>
+            <div><b>VON Lugbe Rotarians</b><small>Club Account</small></div>
+            <button title="Sign out">↪</button>
+        </div>
+    </aside>
+    <main class="main-area">
+        <header class="topbar">
+            <button class="mobile-menu" @onclick="ToggleMenu" aria-label="Open navigation">☰</button>
+            <div class="top-search"><span>⌕</span><input placeholder="Search members..." /></div>
+            <div class="top-actions">
+                <span class="meeting-date">Next meeting: <b>9 Jul, 6:00 PM</b></span>
+                <button class="bell" aria-label="Notifications">♢<i></i></button>
+                <div class="mini-avatar">VR</div>
+            </div>
+        </header>
+        @Body
+    </main>
+</div>
+
+@code {
+    private bool _menuOpen;
+    private void ToggleMenu() => _menuOpen = !_menuOpen;
+}
