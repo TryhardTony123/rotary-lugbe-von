@@ -150,7 +150,7 @@
             <div class="panel-heading">
                 <div><h2>Recent attendance</h2><p>Thursday fellowship · 2 July 2026</p></div>
                 <div class="panel-actions">
-                    <div class="table-search"><span>⌕</span><input placeholder="Find member" @bind="_query" @bind:event="oninput" /></div>
+                    <div class="table-search"><span>⌕</span><input placeholder="Find member" @bind="Query" @bind:event="oninput" /></div>
                     <a class="outline-btn" href="attendance-register.csv" download>Export</a>
                 </div>
             </div>
@@ -163,7 +163,7 @@
                 <table>
                     <thead><tr><th>Member</th><th>Classification</th><th>Check-in</th><th>Status</th><th></th></tr></thead>
                     <tbody>
-                        @foreach (var member in FilteredMembers)
+                        @foreach (var member in PagedMembers)
                         {
                             <tr>
                                 <td><div class="member"><span style="background:@member.Color">@member.Initials</span><div><b>@member.Name</b><small>@member.Id</small></div></div></td>
@@ -176,6 +176,19 @@
                     </tbody>
                 </table>
             </div>
+            @if (TotalPages > 1)
+            {
+                <nav class="member-pagination" aria-label="Member register pages">
+                    <button disabled="@(_currentMemberPage == 1)" @onclick="() => ChangeMemberPage(_currentMemberPage - 1)">← Previous</button>
+                    @foreach (var pageNumber in Enumerable.Range(1, TotalPages))
+                    {
+                        <button class="@(pageNumber == _currentMemberPage ? "active" : "")"
+                                aria-current="@(pageNumber == _currentMemberPage ? "page" : null)"
+                                @onclick="() => ChangeMemberPage(pageNumber)">@pageNumber</button>
+                    }
+                    <button disabled="@(_currentMemberPage == TotalPages)" @onclick="() => ChangeMemberPage(_currentMemberPage + 1)">Next →</button>
+                </nav>
+            }
             <a class="view-all" href="#members">View full attendance register <span>→</span></a>
         </div>
 
@@ -190,7 +203,7 @@
                 <small>NEXT BIRTHDAY · IN 2 DAYS</small>
                 <h3>Chidi Nwosu</h3>
                 <p>Monday, 6 July</p>
-                <button @onclick="SendChidiWish">Send birthday wish</button>
+                <a href="@BirthdayWishUrl("Chidi Nwosu")" target="_blank" rel="noopener">Send birthday wish</a>
             </div>
             <div class="birthday-list">
                 @foreach (var birthday in Birthdays)
@@ -198,7 +211,7 @@
                     <article>
                         <div class="date-tile"><b>@birthday.Day</b><small>JUL</small></div>
                         <div><b>@birthday.Name</b><small>@birthday.Role</small></div>
-                        <button @onclick="() => SendWish(birthday.Name)" title="Send birthday wish">✉</button>
+                        <a href="@BirthdayWishUrl(birthday.Name)" target="_blank" rel="noopener" title="Send birthday wish">✉</a>
                     </article>
                 }
             </div>
@@ -297,6 +310,19 @@
     </div>
 }
 
+@if (_selectedMemberDetails is not null)
+{
+    <div class="modal-backdrop">
+        <section class="checkin-modal member-details-modal">
+            <header><div><span>@_selectedMemberDetails.Initials</span><div><h2>@_selectedMemberDetails.Name</h2><p>Rotary Club of Abuja Lugbe VON</p></div></div><button @onclick="CloseMemberDetails">×</button></header>
+            <div class="member-detail-row"><small>Member ID</small><b>@_selectedMemberDetails.Id</b></div>
+            <div class="member-detail-row"><small>Classification</small><b>@_selectedMemberDetails.Classification</b></div>
+            <div class="member-detail-row"><small>Attendance status</small><b>@(_selectedMemberDetails.Present ? "Present" : "Absent")</b></div>
+            <button class="save-button" @onclick="CloseMemberDetails">Close details</button>
+        </section>
+    </div>
+}
+
 @if (!string.IsNullOrEmpty(_toast))
 {
     <div class="toast"><span>✓</span>@_toast</div>
@@ -314,6 +340,9 @@
 
 @code {
     private string _query = "";
+    private int _currentMemberPage = 1;
+    private const int MembersPerPage = 8;
+    private Member? _selectedMemberDetails;
     private bool _showCheckIn;
     private string _selectedMember = "";
     private string _checkInStatus = "Present";
@@ -374,6 +403,18 @@
     ];
 
     private IEnumerable<Member> FilteredMembers => Members.Where(m => $"{m.Name} {m.Classification} {m.Id}".Contains(_query, StringComparison.OrdinalIgnoreCase));
+    private string Query
+    {
+        get => _query;
+        set
+        {
+            _query = value;
+            _currentMemberPage = 1;
+        }
+    }
+    private IEnumerable<Member> PagedMembers => FilteredMembers.Skip((_currentMemberPage - 1) * MembersPerPage).Take(MembersPerPage);
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredMembers.Count() / (double)MembersPerPage));
+    private void ChangeMemberPage(int page) => _currentMemberPage = Math.Clamp(page, 1, TotalPages);
     protected override void OnInitialized()
     {
         _clockTimer = new Timer(_ =>
@@ -417,13 +458,10 @@
     private void CloseInvitation() => _showInvitation = false;
     private void OpenVisitorCheckIn() { _showVisitorCheckIn = true; _visitorNotice = ""; }
     private void CloseVisitorCheckIn() => _showVisitorCheckIn = false;
-    private Task SendChidiWish() => SendWish("Chidi Nwosu");
-    private async Task ShowMember(string name)
-    {
-        _toast = $"Member selected: {name}.";
-        await Task.Delay(2800);
-        _toast = "";
-    }
+    private string BirthdayWishUrl(string name) =>
+        $"https://wa.me/?text={Uri.EscapeDataString($"Happy birthday, RTN. {name}! Warm wishes from Rotary Club of Abuja Lugbe VON.")}";
+    private void ShowMember(string name) => _selectedMemberDetails = Members.First(m => m.Name == name);
+    private void CloseMemberDetails() => _selectedMemberDetails = null;
     private async Task SaveVisitorCheckIn()
     {
         var phoneDigits = new string(_visitorPhone.Where(char.IsDigit).ToArray());
