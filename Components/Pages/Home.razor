@@ -189,7 +189,10 @@
                     <button disabled="@(_currentMemberPage == TotalPages)" @onclick="() => ChangeMemberPage(_currentMemberPage + 1)">Next →</button>
                 </nav>
             }
-            <a class="view-all" href="#members">View full attendance register <span>→</span></a>
+            <button class="view-all" @onclick="ToggleFullRegister">
+                @(_showAllMembers ? "Return to paginated register" : "View full attendance register")
+                <span>@(_showAllMembers ? "↑" : "→")</span>
+            </button>
         </div>
 
         <aside class="panel birthday-panel" id="birthdays">
@@ -342,6 +345,7 @@
     private string _query = "";
     private int _currentMemberPage = 1;
     private const int MembersPerPage = 8;
+    private bool _showAllMembers;
     private Member? _selectedMemberDetails;
     [SupplyParameterFromQuery(Name = "q")]
     public string? MemberSearch { get; set; }
@@ -412,11 +416,21 @@
         {
             _query = value;
             _currentMemberPage = 1;
+            _showAllMembers = false;
         }
     }
-    private IEnumerable<Member> PagedMembers => FilteredMembers.Skip((_currentMemberPage - 1) * MembersPerPage).Take(MembersPerPage);
-    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredMembers.Count() / (double)MembersPerPage));
+    private IEnumerable<Member> PagedMembers => _showAllMembers
+        ? FilteredMembers
+        : FilteredMembers.Skip((_currentMemberPage - 1) * MembersPerPage).Take(MembersPerPage);
+    private int TotalPages => _showAllMembers
+        ? 1
+        : Math.Max(1, (int)Math.Ceiling(FilteredMembers.Count() / (double)MembersPerPage));
     private void ChangeMemberPage(int page) => _currentMemberPage = Math.Clamp(page, 1, TotalPages);
+    private void ToggleFullRegister()
+    {
+        _showAllMembers = !_showAllMembers;
+        _currentMemberPage = 1;
+    }
     protected override void OnInitialized()
     {
         _clockTimer = new Timer(_ =>
