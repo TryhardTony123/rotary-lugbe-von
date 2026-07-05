@@ -64,6 +64,14 @@
             <a href="tel:+2348038046707">Call club contact</a>
             <a class="meeting-whatsapp" href="https://wa.me/2348038046707?text=Hello%20RTN.%20Femi%2C%20I%20would%20like%20to%20attend%20the%20next%20Rotary%20Lugbe%20VON%20fellowship." target="_blank" rel="noopener">Request meeting details</a>
         </div>
+        @if (!string.IsNullOrEmpty(_visitorRegistrationId))
+        {
+            <div class="registered-visitor">
+                <div><small>VISITOR REGISTRATION</small><b>@_visitorRegistrationId</b></div>
+                <div><small>VISITING ROTARIAN</small><b>RTN. @_registeredVisitorName · @_registeredVisitorClub</b></div>
+                <a href="@($"tel:{_registeredVisitorPhone}")">Call visiting Rotarian</a>
+            </div>
+        }
     </section>
 
     <section class="rotary-year-banner">
@@ -282,6 +290,7 @@
             <label>Phone number
                 <input type="tel" placeholder="Enter your phone number" @bind="_visitorPhone" />
             </label>
+            <p class="registration-hint">Your phone number creates your unique registration ID, for example REG-080162043955.</p>
             @if (!string.IsNullOrEmpty(_visitorNotice)) { <p class="modal-notice">@_visitorNotice</p> }
             <button class="save-button" @onclick="SaveVisitorCheckIn">Register visit</button>
         </section>
@@ -317,6 +326,10 @@
     private string _visitorClub = "";
     private string _visitorPhone = "";
     private string _visitorNotice = "";
+    private string _visitorRegistrationId = "";
+    private string _registeredVisitorName = "";
+    private string _registeredVisitorClub = "";
+    private string _registeredVisitorPhone = "";
     private DateTime _currentTime = GetLagosTime();
     private Timer? _clockTimer;
 
@@ -413,14 +426,24 @@
     }
     private async Task SaveVisitorCheckIn()
     {
+        var phoneDigits = new string(_visitorPhone.Where(char.IsDigit).ToArray());
         if (string.IsNullOrWhiteSpace(_visitorName) || string.IsNullOrWhiteSpace(_visitorClub))
         {
             _visitorNotice = "Please enter your name and Rotary club.";
             return;
         }
+        if (phoneDigits.Length < 10)
+        {
+            _visitorNotice = "Please enter a valid phone number.";
+            return;
+        }
 
+        _visitorRegistrationId = $"REG-{phoneDigits}";
+        _registeredVisitorName = _visitorName.Trim();
+        _registeredVisitorClub = _visitorClub.Trim();
+        _registeredVisitorPhone = phoneDigits;
         _showVisitorCheckIn = false;
-        _toast = $"Welcome, RTN. {_visitorName}. Your visit has been registered.";
+        _toast = $"Welcome, RTN. {_registeredVisitorName}. Registration ID: {_visitorRegistrationId}.";
         _visitorName = "";
         _visitorClub = "";
         _visitorPhone = "";
