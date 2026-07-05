@@ -26,6 +26,19 @@
         </div>
     </section>
 
+    <section class="visitor-rtn-card" id="visitor-rtn">
+        <div>
+            <span class="overline">VISITING ROTARIANS</span>
+            <h2>Visiting RTN? You are welcome here.</h2>
+            <p>Register your visit or contact RTN. Femi before fellowship.</p>
+        </div>
+        <div class="visitor-rtn-links">
+            <button @onclick="OpenVisitorCheckIn">Register as visiting RTN</button>
+            <a href="tel:+2348020336898">Call RTN. Femi</a>
+            <a class="visitor-whatsapp" href="https://wa.me/2348020336898?text=Hello%20RTN.%20Femi%2C%20I%20am%20a%20visiting%20Rotarian." target="_blank" rel="noopener">WhatsApp RTN. Femi</a>
+        </div>
+    </section>
+
     <section class="rotary-year-banner">
         <img src="new-rotary-year.jpeg" alt="Happy New Rotary Year" />
         <div>
@@ -192,6 +205,26 @@
     </div>
 }
 
+@if (_showVisitorCheckIn)
+{
+    <div class="modal-backdrop">
+        <section class="checkin-modal">
+            <header><div><span>VR</span><div><h2>Visiting Rotarian registration</h2><p>Welcome to Rotary Club of Abuja Lugbe VON</p></div></div><button @onclick="CloseVisitorCheckIn">×</button></header>
+            <label>Full name
+                <input placeholder="Enter your full name" @bind="_visitorName" />
+            </label>
+            <label>Rotary club
+                <input placeholder="Enter your home club" @bind="_visitorClub" />
+            </label>
+            <label>Phone number
+                <input type="tel" placeholder="Enter your phone number" @bind="_visitorPhone" />
+            </label>
+            @if (!string.IsNullOrEmpty(_visitorNotice)) { <p class="modal-notice">@_visitorNotice</p> }
+            <button class="save-button" @onclick="SaveVisitorCheckIn">Register visit</button>
+        </section>
+    </div>
+}
+
 @if (!string.IsNullOrEmpty(_toast))
 {
     <div class="toast"><span>✓</span>@_toast</div>
@@ -216,6 +249,11 @@
     private string _toast = "";
     private bool _showInvitation;
     private string _bankName = "";
+    private bool _showVisitorCheckIn;
+    private string _visitorName = "";
+    private string _visitorClub = "";
+    private string _visitorPhone = "";
+    private string _visitorNotice = "";
 
     private readonly List<Member> Members =
     [
@@ -256,10 +294,28 @@
     private void SetAbsent() => _checkInStatus = "Absent";
     private void OpenInvitation() => _showInvitation = true;
     private void CloseInvitation() => _showInvitation = false;
+    private void OpenVisitorCheckIn() { _showVisitorCheckIn = true; _visitorNotice = ""; }
+    private void CloseVisitorCheckIn() => _showVisitorCheckIn = false;
     private Task SendChidiWish() => SendWish("Chidi Nwosu");
     private async Task ShowMember(string name)
     {
         _toast = $"Member selected: {name}.";
+        await Task.Delay(2800);
+        _toast = "";
+    }
+    private async Task SaveVisitorCheckIn()
+    {
+        if (string.IsNullOrWhiteSpace(_visitorName) || string.IsNullOrWhiteSpace(_visitorClub))
+        {
+            _visitorNotice = "Please enter your name and Rotary club.";
+            return;
+        }
+
+        _showVisitorCheckIn = false;
+        _toast = $"Welcome, RTN. {_visitorName}. Your visit has been registered.";
+        _visitorName = "";
+        _visitorClub = "";
+        _visitorPhone = "";
         await Task.Delay(2800);
         _toast = "";
     }
