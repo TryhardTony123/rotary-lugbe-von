@@ -5,6 +5,13 @@
 <PageTitle>Rotary Club of Lugbe VON — Attendance & Birthdays</PageTitle>
 
 <div class="dashboard" id="dashboard">
+    <a class="newsletter-alert" href="#newsletter">
+        <span class="alert-dot"></span>
+        <strong>NEW VIDEO NEWSLETTER</strong>
+        <span>Watch the latest Rotary Lugbe VON update</span>
+        <b>WATCH NOW →</b>
+    </a>
+
     <section class="welcome">
         <div>
             <p class="overline live-clock">@_currentTime.ToString("dddd, d MMMM yyyy").ToUpperInvariant() · @_currentTime.ToString("h:mm:ss tt") WAT</p>
@@ -187,12 +194,13 @@
             <span class="overline">CLUB NEWSLETTER</span>
             <h2>Rotary Lugbe VON News &amp; Updates</h2>
             <p>Watch club announcements, fellowship highlights, service projects, and messages from club leadership.</p>
-            <span class="newsletter-status">Next video newsletter coming soon</span>
+            <span class="newsletter-status">New video newsletter available now</span>
         </div>
-        <div class="newsletter-video-placeholder" aria-label="Newsletter video coming soon">
-            <span>▶</span>
-            <b>Video newsletter</b>
-            <small>Your club video will appear here</small>
+        <div class="newsletter-video">
+            <video controls preload="metadata" playsinline>
+                <source src="rtn-video-newsletter.mp4" type="video/mp4" />
+                Your browser does not support this video.
+            </video>
         </div>
     </section>
 </div>
