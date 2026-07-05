@@ -1,12 +1,13 @@
 @page "/"
 @rendermode InteractiveServer
+@implements IDisposable
 
 <PageTitle>Rotary Club of Lugbe VON — Attendance & Birthdays</PageTitle>
 
 <div class="dashboard" id="dashboard">
     <section class="welcome">
         <div>
-            <p class="overline">SATURDAY, 4 JULY 2026</p>
+            <p class="overline live-clock">@_currentTime.ToString("dddd, d MMMM yyyy").ToUpperInvariant() · @_currentTime.ToString("h:mm:ss tt") WAT</p>
             <h1>Good evening, VON Lugbe Rotarians.</h1>
             <p>Here’s what’s happening in your club this month.</p>
         </div>
@@ -254,6 +255,8 @@
     private string _visitorClub = "";
     private string _visitorPhone = "";
     private string _visitorNotice = "";
+    private DateTime _currentTime = GetLagosTime();
+    private Timer? _clockTimer;
 
     private readonly List<Member> Members =
     [
@@ -276,6 +279,29 @@
     ];
 
     private IEnumerable<Member> FilteredMembers => Members.Where(m => $"{m.Name} {m.Classification} {m.Id}".Contains(_query, StringComparison.OrdinalIgnoreCase));
+    protected override void OnInitialized()
+    {
+        _clockTimer = new Timer(_ =>
+        {
+            _currentTime = GetLagosTime();
+            _ = InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+    private static DateTime GetLagosTime()
+    {
+        try
+        {
+            var zone = TimeZoneInfo.FindSystemTimeZoneById(OperatingSystem.IsWindows()
+                ? "W. Central Africa Standard Time"
+                : "Africa/Lagos");
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zone);
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return DateTime.UtcNow.AddHours(1);
+        }
+    }
+    public void Dispose() => _clockTimer?.Dispose();
     private string WhatsAppShareUrl
     {
         get
