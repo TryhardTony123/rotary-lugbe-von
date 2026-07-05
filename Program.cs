@@ -60,6 +60,13 @@ app.MapPost("/club-login", async context =>
     await context.Response.WriteAsync(LoginPage("That club access code is incorrect."));
 }).DisableAntiforgery();
 
+app.MapGet("/club-logout", context =>
+{
+    context.Response.Cookies.Delete("rotary_club_access");
+    context.Response.Redirect("/");
+    return Task.CompletedTask;
+});
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 app.Run();

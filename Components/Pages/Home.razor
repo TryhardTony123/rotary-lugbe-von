@@ -17,11 +17,11 @@
         <img src="rotary-logo.jpeg" alt="Rotary Club of Abuja Lugbe VON logo" />
         <div class="club-identity-copy">
             <span class="overline">ROTARY CLUB OF ABUJA LUGBE VON</span>
-            <h2>Club contact person: Femi</h2>
+            <h2>Club contact RTN: Femi</h2>
             <p>Call the club contact directly for enquiries and fellowship information.</p>
         </div>
         <div class="club-phone-links">
-            <a href="tel:+2348020336898"><small>CALL FEMI</small><b>0802 033 6898</b></a>
+            <a href="tel:+2348020336898"><small>CALL RTN. FEMI</small><b>0802 033 6898</b></a>
             <a href="tel:+2348038046707"><small>ALTERNATE NUMBER</small><b>0803 804 6707</b></a>
         </div>
     </section>
@@ -69,11 +69,11 @@
         <button class="invitation-button" @onclick="OpenInvitation"><span>▧</span> View invitation</button>
     </section>
 
-    <section class="club-contact-card" aria-label="Club fellowship details">
+    <section class="club-contact-card" id="club-details" aria-label="Club fellowship details">
         <div><small>Venue</small><b>10PM Lounge, VON</b></div>
         <div><small>Fellowship schedule</small><b>Biweekly (twice a month)</b></div>
         <div><small>Time</small><b>3:30 PM for 4:00 PM</b></div>
-        <div><small>Club contact person</small><b>Femi · 08020336898 / 08038046707</b></div>
+        <div><small>Club contact person</small><b>RTN. Femi: 08020336898 / 08038046707</b></div>
     </section>
 
     <section class="bank-share-card">
@@ -103,7 +103,7 @@
                 <div><h2>Recent attendance</h2><p>Thursday fellowship · 2 July 2026</p></div>
                 <div class="panel-actions">
                     <div class="table-search"><span>⌕</span><input placeholder="Find member" @bind="_query" @bind:event="oninput" /></div>
-                    <button class="outline-btn">Export</button>
+                    <a class="outline-btn" href="attendance-register.csv" download>Export</a>
                 </div>
             </div>
             <div class="attendance-summary">
@@ -111,7 +111,7 @@
                 <div><b>Strong turnout</b><p>@PresentCount members checked in for the last fellowship.</p></div>
                 <div class="legend"><span><i class="present-dot"></i> Present @PresentCount</span><span><i class="absent-dot"></i> Absent @AbsentCount</span></div>
             </div>
-            <div class="table-wrap">
+            <div class="table-wrap" id="members">
                 <table>
                     <thead><tr><th>Member</th><th>Classification</th><th>Check-in</th><th>Status</th><th></th></tr></thead>
                     <tbody>
@@ -122,19 +122,19 @@
                                 <td>@member.Classification</td>
                                 <td>@member.CheckIn</td>
                                 <td><button class="status @(member.Present ? "present" : "absent")" @onclick="() => ToggleAttendance(member)"><i></i>@(member.Present ? "Present" : "Absent")</button></td>
-                                <td><button class="more">•••</button></td>
+                                <td><button class="more" title="View member details" @onclick="() => ShowMember(member.Name)">•••</button></td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-            <button class="view-all">View full attendance register <span>→</span></button>
+            <a class="view-all" href="#members">View full attendance register <span>→</span></a>
         </div>
 
         <aside class="panel birthday-panel" id="birthdays">
             <div class="panel-heading">
                 <div><h2>Upcoming birthdays</h2><p>Celebrate our Rotarians</p></div>
-                <button class="calendar-button">▦</button>
+                <a class="calendar-button" href="#birthdays" aria-label="Open birthdays">▦</a>
             </div>
             <div class="birthday-hero">
                 <span class="confetti one">✦</span><span class="confetti two">•</span><span class="confetti three">◆</span>
@@ -154,7 +154,7 @@
                     </article>
                 }
             </div>
-            <button class="view-all">View all birthdays <span>→</span></button>
+            <a class="view-all" href="#birthdays">View all birthdays <span>→</span></a>
         </aside>
     </section>
 
@@ -257,6 +257,12 @@
     private void OpenInvitation() => _showInvitation = true;
     private void CloseInvitation() => _showInvitation = false;
     private Task SendChidiWish() => SendWish("Chidi Nwosu");
+    private async Task ShowMember(string name)
+    {
+        _toast = $"Member selected: {name}.";
+        await Task.Delay(2800);
+        _toast = "";
+    }
     private async Task SaveCheckIn()
     {
         if (string.IsNullOrEmpty(_selectedMember)) { _notice = "Please select a member."; return; }
